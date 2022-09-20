@@ -8,7 +8,6 @@ DELAY_TIME = 60 # seconds
 URL = 'https://www.t2c.fr/actualites-infos-trafic-par-ligne/ligne-a'
 
 
-
 filehandle = open("null_content.html", encoding = "ISO-8859-1", mode = "r")
 null_response_text = filehandle.read() 
 filehandle.close()
@@ -45,7 +44,6 @@ def tramIsWorkingRN():
     else:
         return False
         
-
 # GOOGLE SHEETS
 import gspread
 gc = gspread.service_account()
@@ -63,8 +61,7 @@ def updateGoogleSheetCount():
     # find curent count
     current_count = worksheet.cell(row, 3).value
     # update the cell
-    worksheet.update_cell(row, 3, current_count + 1)
-
+    worksheet.update_cell(row, 3, int(current_count)+1)
 
 
 previousStateTramWorkingRN = True
@@ -77,4 +74,3 @@ while True:
         previousStateTramWorkingRN = tramIsWorkingRN()
         updateGoogleSheetCount()
     time.sleep(DELAY_TIME)
-
