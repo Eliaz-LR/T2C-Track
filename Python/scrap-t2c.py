@@ -9,7 +9,7 @@ URL = 'https://www.t2c.fr/actualites-infos-trafic-par-ligne/ligne-a'
 
 
 
-filehandle = open("null_content.html", 'r')
+filehandle = open("null_content.html", encoding = "ISO-8859-1", mode = "r")
 null_response_text = filehandle.read() 
 filehandle.close()
 
@@ -32,7 +32,11 @@ def process_html(string):
 def tramIsWorkingRN():
     """Check if the website was updated"""
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36','Pragma': 'no-cache', 'Cache-Control': 'no-cache'}
-    response = requests.get(URL, headers=headers)
+    try:
+        response = requests.get(URL, headers=headers)
+    except requests.exceptions.RequestException as e:
+        log.error(e)
+        return False
 
     processed_response_html = process_html(response.text)
 
