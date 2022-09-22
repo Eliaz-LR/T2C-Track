@@ -64,11 +64,11 @@ def updateGoogleSheetCount():
     worksheet.update_cell(row, 3, int(current_count)+1)
 
     # update the state
-    worksheet.update_cell('F3', previousStateTramWorkingRN)
+    worksheet.update_cell(3,6, previousStateTramWorkingRN)
     #update the time/date
-    worksheet.update_cell('F4', time.strftime("%d/%m/%Y %H:%M:%S"))
+    worksheet.update_cell(4,6, time.strftime("%d/%m/%Y %H:%M:%S"))
 
-previousStateTramWorkingRN = True
+previousStateTramWorkingRN = tramIsWorkingRN()
 
 while True:
     if tramIsWorkingRN() == previousStateTramWorkingRN:
