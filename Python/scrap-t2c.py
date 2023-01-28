@@ -5,7 +5,7 @@ import time
 import logging
 
 DELAY_TIME = 60 # seconds
-URL = 'https://www.t2c.fr/actualites-infos-trafic-par-ligne/ligne-a'
+URL = 'https://www.t2c.fr/actualites-infos-trafic-par-ligne/ligne'
 
 
 filehandle = open("null_content.html", encoding = "ISO-8859-1", mode = "r")
