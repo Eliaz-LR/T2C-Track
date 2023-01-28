@@ -22,8 +22,8 @@ def process_html(string):
     # make the html look good
     soup.prettify()
 
-    # keep only the main content
-    main = soup.find("main")
+    # keep only the div with the class "c-information__holder"
+    main = soup.find("div", {"class": "c-information__holder"})
     
     # convert to a string, remove '\r', and return
     return str(main).replace('\r', '')
@@ -50,9 +50,28 @@ gc = gspread.service_account()
 sh = gc.open("T2C Tracker")
 worksheet = sh.sheet1
 
-def updateGoogleSheetCount():
+def next_available_row(col_num):
+    str_list = list(filter(None, worksheet.col_values(col_num)))
+    return str(len(str_list)+1)
+
+class Outage:
+    def __init__(self, start_time, HTML):
+        self.row = next_available_row(9)
+        self.id = self.row-1
+        self.start_time = start_time
+        self.end_time = None
+        self.HTML = HTML
+
+def updateGoogleSheet():
     """Update the Google Sheet"""
     log.info("Updating Google Sheet")
+    # update the state
+    worksheet.update_cell(3,7, previousStateTramWorkingRN)
+    #update the time/date
+    worksheet.update_cell(4,7, time.strftime("%d/%m/%Y %H:%M:%S"))
+
+def addOutageToGoogleSheets():
+    """Update the Google Sheet"""
     # get the current date
     now = time.strftime("%d/%m/%Y")
     
@@ -63,18 +82,33 @@ def updateGoogleSheetCount():
     # update the cell
     worksheet.update_cell(row, 3, int(current_count)+1)
 
-    # update the state
-    worksheet.update_cell(3,6, previousStateTramWorkingRN)
-    #update the time/date
-    worksheet.update_cell(4,6, time.strftime("%d/%m/%Y %H:%M:%S"))
-
+    # add the outage to the sheet
+    if previousStateTramWorkingRN == True:
+        outage = Outage(time.strftime("%d/%m/%Y %H:%M:%S"), processed_response_html)
+        log.info("Adding outage to Google Sheets")
+        worksheet.update_cell(outage.row, 9, outage.id)
+        worksheet.update_cell(outage.row, 10, outage.start_time)
+        worksheet.update_cell(outage.row, 14, outage.HTML)
+        current_ids = worksheet.cell(row, 4).value
+        worksheet.update_cell(row, 4, current_ids+","+outage.id)
+    else:
+        outage.end_time = time.strftime("%d/%m/%Y %H:%M:%S")
+        log.info("Adding outage to Google Sheets")
+        worksheet.update_cell(outage.row, 11, outage.end_time)
+        current_ids = worksheet.cell(row, 5).value
+        if outage.id not in current_ids:
+            worksheet.update_cell(row, 5, outage.id)
+    
+processed_response_html = process_html(null_response_text)
 previousStateTramWorkingRN = tramIsWorkingRN()
+updateGoogleSheet()
 
 while True:
     if tramIsWorkingRN() == previousStateTramWorkingRN:
         log.info("No change")
     else:
         log.info("CHANGE DETECTED")
+        addOutageToGoogleSheets()
         previousStateTramWorkingRN = tramIsWorkingRN()
-        updateGoogleSheetCount()
+        updateGoogleSheet()
     time.sleep(DELAY_TIME)
