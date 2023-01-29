@@ -8,7 +8,6 @@ import gspread
 DELAY_TIME = 60  # seconds
 URL = 'https://www.t2c.fr/actualites-infos-trafic-par-ligne/ligne'
 
-
 filehandle = open("null_content.html", encoding="ISO-8859-1", mode="r")
 null_response_text = filehandle.read()
 filehandle.close()
@@ -22,14 +21,10 @@ def process_html(string):
     """Full website HTML to just the interesting part"""
     soup = BeautifulSoup(string, features="lxml")
 
-    # make the html look good
-    soup.prettify()
+    soup.prettify()  # make the html look good
+    main_content_html = soup.find("div", {"class": "c-information__holder"})
 
-    # keep only the div with the class "c-information__holder"
-    main = soup.find("div", {"class": "c-information__holder"})
-
-    # convert to a string, remove '\r', and return
-    return str(main).replace('\r', '')
+    return str(main_content_html).replace('\r', '')
 
 
 def tramIsWorkingRN():
@@ -43,7 +38,7 @@ def tramIsWorkingRN():
 
     processed_response_html = process_html(response.text)
 
-    if null_response_text == processed_response_html:
+    if processed_response_html == null_response_text :
         return True
     else:
         return False
@@ -70,7 +65,7 @@ class Outage:
 
 
 def updateGoogleSheet():
-    """Update the Google Sheet"""
+    """Update the Google Sheet time and state"""
     log.info("Updating Google Sheet")
     # update the state
     worksheet.update_cell(3, 7, previousStateTramWorkingRN)
@@ -80,13 +75,14 @@ def updateGoogleSheet():
 
 def addOutageToGoogleSheets():
     """Starts or finishes an outage and updates the Google Sheet"""
+    # update the count
     now = time.strftime("%d/%m/%Y")
     cell = worksheet.find(now)
     row = cell.row
     current_count = worksheet.cell(row, 3).value
     worksheet.update_cell(row, 3, int(current_count)+1)
 
-    # add the outage to the sheet
+    # add/modify the outage to the sheet
     if previousStateTramWorkingRN is True:
         outage = Outage(time.strftime("%d/%m/%Y %H:%M:%S"), processed_response_html)
         log.info("Adding outage to Google Sheets")
