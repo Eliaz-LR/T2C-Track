@@ -52,7 +52,7 @@ worksheet = sh.sheet1
 
 def next_available_row(col_num):
     str_list = list(filter(None, worksheet.col_values(col_num)))
-    return str(len(str_list)+1)
+    return len(str_list)+1
 
 
 class Outage:
@@ -90,8 +90,8 @@ def addOutageToGoogleSheets():
         worksheet.update_cell(outage.row, 10, outage.start_time)
         worksheet.update_cell(outage.row, 14, outage.HTML)
         current_ids = worksheet.cell(row, 4).value
-        worksheet.update_cell(row, 4, current_ids+","+outage.id)
-    else:
+        worksheet.update_cell(row, 4, current_ids+","+str(outage.id))
+    elif outage is not None:
         outage.end_time = time.strftime("%d/%m/%Y %H:%M:%S")
         log.info("Adding outage to Google Sheets")
         worksheet.update_cell(outage.row, 11, outage.end_time)
@@ -99,7 +99,7 @@ def addOutageToGoogleSheets():
         if outage.id not in current_ids:
             worksheet.update_cell(row, 5, outage.id)
 
-
+outage=None
 processed_response_html = process_html(null_response_text)
 previousStateTramWorkingRN = tramIsWorkingRN()
 updateGoogleSheet()
