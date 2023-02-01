@@ -17,7 +17,7 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"), format='%(asctime)
 log.info("Running Website Monitor")
 
 
-def process_html(string):
+def process_html(string : str) -> str:
     """Full website HTML to just the interesting part"""
     soup = BeautifulSoup(string, features="lxml")
 
@@ -27,7 +27,7 @@ def process_html(string):
     return str(main_content_html).replace('\r', '')
 
 
-def tramIsWorkingRN():
+def tramIsWorkingRN() -> bool:
     """Check if the website was updated"""
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36','Pragma': 'no-cache', 'Cache-Control': 'no-cache'}
     try:
@@ -50,13 +50,13 @@ sh = gc.open("T2C Tracker")
 worksheet = sh.sheet1
 
 
-def next_available_row(col_num):
+def next_available_row(col_num : int) -> int:
     str_list = list(filter(None, worksheet.col_values(col_num)))
     return len(str_list)+1
 
 
 class Outage:
-    def __init__(self, start_time, HTML):
+    def __init__(self, start_time : str, HTML : str):
         self.row = next_available_row(9)
         self.id = self.row-1
         self.start_time = start_time
