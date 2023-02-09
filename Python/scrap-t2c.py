@@ -75,6 +75,7 @@ def updateGoogleSheet():
 
 def addOutageToGoogleSheets():
     """Starts or finishes an outage and updates the Google Sheet"""
+    global outage
     # update the count
     now = time.strftime("%d/%m/%Y")
     cell = worksheet.find(now)
