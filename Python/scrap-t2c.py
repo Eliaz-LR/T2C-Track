@@ -94,10 +94,10 @@ def addOutageToGoogleSheets():
         worksheet.update_cell(row, 4, str(current_ids)+","+str(outage.id))
     elif outage is not None:
         outage.end_time = time.strftime("%d/%m/%Y %H:%M:%S")
-        log.info("Adding outage to Google Sheets")
+        log.info("Ending outage in Google Sheets")
         worksheet.update_cell(outage.row, 11, outage.end_time)
         current_ids = worksheet.cell(row, 5).value
-        if outage.id not in current_ids:
+        if str(outage.id) not in current_ids:
             worksheet.update_cell(row, 5, outage.id)
 
 outage=None
